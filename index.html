@@ -15,34 +15,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    :root {
-      --lampung-red: #7a0000;
-      --lampung-gold: #d4af37;
-      --lampung-dark-gold: #b38f28;
-    }
-
     body {
-      background-color: #f4f6f9;
+      background-color: #f8f9fa;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    /* Tapis Pattern Top Bar */
-    .tapis-top-bar {
-      height: 8px;
-      background: repeating-linear-gradient(
-        45deg,
-        var(--lampung-gold),
-        var(--lampung-gold) 10px,
-        var(--lampung-red) 10px,
-        var(--lampung-red) 20px
-      );
-    }
-
-    .card-lampung {
-      border: none;
-      border-top: 4px solid var(--lampung-gold);
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
     .logo-jsit {
@@ -52,13 +27,13 @@
 
     .portal-title {
       font-weight: 800;
-      color: var(--lampung-red);
+      color: #0d6efd; /* Biru khas JSIT */
       letter-spacing: 0.5px;
     }
 
     .portal-subtitle {
-      color: #555;
-      font-size: 1rem;
+      color: #6c757d;
+      font-size: 0.95rem;
       font-weight: 600;
     }
 
@@ -74,62 +49,32 @@
       content: "";
       flex: 1;
       height: 2px;
-      background: linear-gradient(to right, transparent, var(--lampung-gold), transparent);
+      background: linear-gradient(to right, transparent, #0d6efd, transparent);
       max-width: 150px;
     }
 
-    .siger-icon {
-      color: var(--lampung-gold);
-      font-size: 1.5rem;
+    .siger-img {
+      height: 35px;
+      width: auto;
       margin: 0 15px;
     }
 
-    .btn-lampung {
-      background-color: var(--lampung-red);
-      color: #fff;
-      border: 1px solid var(--lampung-red);
-    }
-
-    .btn-lampung:hover {
-      background-color: #590000;
-      color: #fff;
-    }
-
-    .badge-lampung {
-      background-color: var(--lampung-red);
-    }
-
-    /* Landmark Gallery Cards */
-    .landmark-img {
-      height: 140px;
-      object-fit: cover;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-    }
-
-    .landmark-card {
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      transition: transform 0.2s ease;
-    }
-
-    .landmark-card:hover {
-      transform: translateY(-4px);
+    .card {
+      border-radius: 12px;
+      border: none;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- TAPIS LAMPUNG PATTERN BAR -->
-  <div class="tapis-top-bar"></div>
-
   <div class="container py-4">
 
     <!-- HEADER -->
-    <div class="card card-lampung shadow-sm">
+    <div class="card shadow-sm">
       <div class="card-body p-4">
         <div class="text-center">
+          <!-- LOGO JSIT -->
           <img src="https://lh3.googleusercontent.com/d/1F7e5q5JbS2RkKS5Wdn2jJLq0qTeUITPv" class="logo-jsit" alt="Logo JSIT Lampung">
           
           <h2 class="portal-title mt-3">PORTAL DATA SIT LAMPUNG</h2>
@@ -137,7 +82,7 @@
           
           <!-- SIGER DIVIDER -->
           <div class="siger-divider">
-            <i class="fa-solid font-awesome siger-icon">👑</i>
+            <img src="https://lh3.googleusercontent.com/d/1bVdLeMaB73lAxhenTx1zuiIG0EPhimTm" class="siger-img" alt="Ikon Siger Lampung">
           </div>
         </div>
 
@@ -145,21 +90,21 @@
         <div class="row mt-3">
           <div class="col-md-5 mb-3">
             <label class="form-label fw-bold text-secondary">Kabupaten / Kota</label>
-            <select id="kabupaten" class="form-select border-warning-subtle">
+            <select id="kabupaten" class="form-select">
               <option value="ALL">Memuat Wilayah...</option>
             </select>
           </div>
 
           <div class="col-md-5 mb-3">
             <label class="form-label fw-bold text-secondary">Kecamatan</label>
-            <select id="kecamatan" class="form-select border-warning-subtle">
+            <select id="kecamatan" class="form-select">
               <option value="ALL">ALL (Semua Kecamatan)</option>
             </select>
           </div>
 
           <div class="col-md-2 mb-3 d-grid">
             <label class="form-label">&nbsp;</label>
-            <button id="btnCari" class="btn btn-lampung fw-bold">
+            <button id="btnCari" class="btn btn-primary fw-bold">
               <i class="fa-solid fa-magnifying-glass me-1"></i> Cari
             </button>
           </div>
@@ -169,11 +114,11 @@
 
     <!-- HASIL PENCARIAN (Default Hidden) -->
     <div id="hasilPencarian" class="mt-4" style="display:none;">
-      <div class="card card-lampung shadow-sm">
+      <div class="card shadow-sm">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="m-0 fw-bold" style="color: var(--lampung-red);">Hasil Pencarian</h5>
-            <span id="jumlahData" class="badge badge-lampung fs-6">0 Data</span>
+            <h5 class="m-0 fw-bold text-primary">Hasil Pencarian</h5>
+            <span id="jumlahData" class="badge bg-primary fs-6">0 Data</span>
           </div>
 
           <table id="tabelSekolah" class="display responsive nowrap w-100">
@@ -196,54 +141,13 @@
       </div>
     </div>
 
-    <!-- IKON & LANDMARK REAL KHAS LAMPUNG -->
-    <div class="mt-5">
-      <div class="text-center mb-3">
-        <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px;">
-          <i class="fa-solid fa-landmark me-1" style="color: var(--lampung-gold);"></i> Landmark Ikonik Bumi Ruwa Jurai
-        </h6>
-      </div>
-      <div class="row g-3 text-center">
-        <!-- Menara Siger -->
-        <div class="col-md-4">
-          <div class="card landmark-card bg-white shadow-sm h-100">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Menara_Siger_Bakauheni.jpg/640px-Menara_Siger_Bakauheni.jpg" class="landmark-img" alt="Menara Siger Bakauheni">
-            <div class="card-body p-2">
-              <small class="fw-bold d-block text-dark">Menara Siger</small>
-              <small class="text-muted" style="font-size: 0.75rem;">Bakauheni, Lampung Selatan</small>
-            </div>
-          </div>
-        </div>
-        <!-- Tugu Adipura / Tugu Gajah -->
-        <div class="col-md-4">
-          <div class="card landmark-card bg-white shadow-sm h-100">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Tugu_Adipura_Bandar_Lampung.JPG/640px-Tugu_Adipura_Bandar_Lampung.JPG" class="landmark-img" alt="Tugu Adipura Bandar Lampung">
-            <div class="card-body p-2">
-              <small class="fw-bold d-block text-dark">Tugu Adipura (Tugu Gajah)</small>
-              <small class="text-muted" style="font-size: 0.75rem;">Pusat Kota Bandar Lampung</small>
-            </div>
-          </div>
-        </div>
-        <!-- Tugu Pengantin -->
-        <div class="col-md-4">
-          <div class="card landmark-card bg-white shadow-sm h-100">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Tugu_Pengantin_Bandar_Lampung.jpg/640px-Tugu_Pengantin_Bandar_Lampung.jpg" class="landmark-img" alt="Tugu Pengantin Lampung">
-            <div class="card-body p-2">
-              <small class="fw-bold d-block text-dark">Tugu Pengantin</small>
-              <small class="text-muted" style="font-size: 0.75rem;">Lungsir, Bandar Lampung</small>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
 
   <!-- MODAL DETAIL -->
   <div class="modal fade" id="detailModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header text-white" style="background-color: var(--lampung-red);">
+        <div class="modal-header bg-primary text-white">
           <h5 class="modal-title fw-bold">Detail Sekolah</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
@@ -264,7 +168,7 @@
 
   <!-- FOOTER -->
   <footer class="text-center mt-4 mb-4 text-muted">
-    <small>© Portal Data SIT Lampung — Sai Bumi Ruwa Jurai</small>
+    <small>© Portal Data SIT Lampung</small>
   </footer>
 
   <!-- JS Libraries -->
