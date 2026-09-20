@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portal Data SIT Lampung</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .logo-jsit {
+      max-height: 90px;
+      width: auto;
+    }
+    .portal-title {
+      font-weight: 700;
+      color: #0d6efd;
+    }
+    .portal-subtitle {
+      color: #6c757d;
+      font-size: 0.95rem;
+    }
+    .card {
+      border-radius: 12px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container py-4">
+
+    <!-- HEADER -->
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <div class="text-center">
+          <img src="https://lh3.googleusercontent.com/d/1F-GDZRu4OhHQAV-pX5yPWGYtIn9W2rvQ/" class="logo-jsit" alt="Logo JSIT">
+          <h2 class="portal-title mt-3">PORTAL DATA SIT LAMPUNG</h2>
+          <p class="portal-subtitle">Jaringan Sekolah Islam Terpadu Lampung</p>
+        </div>
+
+        <!-- FILTER -->
+        <div class="row mt-4">
+          <div class="col-md-5 mb-3">
+            <label class="form-label fw-bold">Kabupaten / Kota</label>
+            <select id="kabupaten" class="form-select">
+              <option value="ALL">Memuat Data...</option>
+            </select>
+          </div>
+
+          <div class="col-md-5 mb-3">
+            <label class="form-label fw-bold">Kecamatan</label>
+            <select id="kecamatan" class="form-select">
+              <option value="ALL">ALL</option>
+            </select>
+          </div>
+
+          <div class="col-md-2 mb-3 d-grid">
+            <label class="form-label">&nbsp;</label>
+            <button id="btnCari" class="btn btn-primary fw-bold">Cari</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HASIL PENCARIAN -->
+    <div id="hasilPencarian" class="mt-4" style="display:none;">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="m-0 font-weight-bold text-primary">Hasil Pencarian</h5>
+            <span id="jumlahData" class="badge bg-primary fs-6">0 Data</span>
+          </div>
+
+          <table id="tabelSekolah" class="display responsive nowrap w-100">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>No Keanggotaan</th>
+                <th>Nama Sekolah</th>
+                <th>Kabupaten/Kota</th>
+                <th>Kecamatan</th>
+                <th>Jenjang</th>
+                <th>Website</th>
+                <th>Sosial Media</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL DETAIL -->
+  <div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">Detail Sekolah</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <table class="table table-striped table-bordered">
+            <tr><th width="30%">No Keanggotaan</th><td id="d_no"></td></tr>
+            <tr><th>Nama Sekolah</th><td id="d_nama"></td></tr>
+            <tr><th>Kabupaten/Kota</th><td id="d_kab"></td></tr>
+            <tr><th>Kecamatan</th><td id="d_kec"></td></tr>
+            <tr><th>Jenjang</th><td id="d_jenjang"></td></tr>
+            <tr><th>Website</th><td id="d_web"></td></tr>
+            <tr><th>Sosial Media</th><td id="d_sosmed"></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="text-center mt-4 mb-3 text-muted">
+    <small>© Portal Data SIT Lampung</small>
+  </footer>
+
+  <!-- JS Libraries -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+
+  <!-- LOGIKA APLIKASI -->
+  <script>
+    // =========================================================
+    // PASTE URL WEB APP APPS SCRIPT ANDA DI SINI
+    // =========================================================
+    const GAS_URL = "script.google.com/macros/s/AKfycbyMyhrCukwwtfyPkwBqvSlwSEzsTWXWrQKs56BO2BRlQ6VJ7BczxrS8lFKlO4VU4P49/exec";
+
+    let allData = [];
+    let dataTable = null;
+
+    $(document).ready(function () {
+      if (GAS_URL === "URL_WEB_APP_APPS_SCRIPT_ANDA_DI_SINI") {
+        alert("Harap masukkan URL Web App Apps Script Anda pada variabel GAS_URL!");
+        return;
+      }
+      loadData();
+
+      $('#kabupaten').on('change', function () {
+        updateKecamatanDropdown();
+      });
+
+      $('#btnCari').on('click', function () {
+        filterAndDisplayData();
+      });
+    });
+
+    function loadData() {
+      fetch(GAS_URL)
+        .then(res => res.json())
+        .then(data => {
+          allData = data;
+          populateKabupatenDropdown();
+          filterAndDisplayData();
+        })
+        .catch(err => {
+          console.error("Gagal memuat data:", err);
+          alert("Gagal mengambil data dari Google Sheet.");
+        });
+    }
+
+    function populateKabupatenDropdown() {
+      const kabSet = new Set();
+      allData.forEach(item => {
+        if (item.kabupaten) kabSet.add(item.kabupaten.trim());
+      });
+
+      let options = '<option value="ALL">ALL (Semua Kabupaten/Kota)</option>';
+      Array.from(kabSet).sort().forEach(kab => {
+        options += `<option value="${kab}">${kab}</option>`;
+      });
+
+      $('#kabupaten').html(options);
+      updateKecamatanDropdown();
+    }
+
+    function updateKecamatanDropdown() {
+      const selectedKab = $('#kabupaten').val();
+      const kecSet = new Set();
+
+      allData.forEach(item => {
+        if (selectedKab === 'ALL' || item.kabupaten === selectedKab) {
+          if (item.kecamatan) kecSet.add(item.kecamatan.trim());
+        }
+      });
+
+      let options = '<option value="ALL">ALL (Semua Kecamatan)</option>';
+      Array.from(kecSet).sort().forEach(kec => {
+        options += `<option value="${kec}">${kec}</option>`;
+      });
+
+      $('#kecamatan').html(options);
+    }
+
+    function filterAndDisplayData() {
+      const kab = $('#kabupaten').val();
+      const kec = $('#kecamatan').val();
+
+      const filtered = allData.filter(item => {
+        const matchKab = (kab === 'ALL' || !kab) ? true : item.kabupaten === kab;
+        const matchKec = (kec === 'ALL' || !kec) ? true : item.kecamatan === kec;
+        return matchKab && matchKec;
+      });
+
+      renderTable(filtered);
+    }
+
+    function renderTable(data) {
+      $('#hasilPencarian').show();
+      $('#jumlahData').text(`${data.length} Data`);
+
+      if (dataTable) {
+        dataTable.destroy();
+      }
+
+      const tbody = $('#tabelSekolah tbody');
+      tbody.empty();
+
+      data.forEach((item, index) => {
+        const webLink = item.website ? `<a href="${formatUrl(item.website)}" target="_blank" class="btn btn-sm btn-outline-primary">Web</a>` : '-';
+        const sosmedLink = item.sosialMedia ? `<a href="${formatUrl(item.sosialMedia)}" target="_blank" class="btn btn-sm btn-outline-info">Medsos</a>` : '-';
+
+        const row = `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${item.noKeanggotaan}</td>
+            <td><strong>${item.namaSekolah}</strong></td>
+            <td>${item.kabupaten}</td>
+            <td>${item.kecamatan}</td>
+            <td><span class="badge bg-secondary">${item.jenjang}</span></td>
+            <td>${webLink}</td>
+            <td>${sosmedLink}</td>
+            <td>
+              <button class="btn btn-sm btn-success" onclick="showDetail('${item.noKeanggotaan}')">Detail</button>
+            </td>
+          </tr>
+        `;
+        tbody.append(row);
+      });
+
+      dataTable = $('#tabelSekolah').DataTable({
+        responsive: true,
+        language: {
+          search: "Cari Cepat:",
+          lengthMenu: "Tampilkan _MENU_ data",
+          info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+          paginate: {
+            first: "Awal",
+            last: "Akhir",
+            next: "›",
+            previous: "‹"
+          }
+        }
+      });
+    }
+
+    function formatUrl(url) {
+      if (!url) return '#';
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        return 'https://' + url;
+      }
+      return url;
+    }
+
+    function showDetail(noKeanggotaan) {
+      const item = allData.find(d => d.noKeanggotaan == noKeanggotaan);
+      if (!item) return;
+
+      $('#d_no').text(item.noKeanggotaan || '-');
+      $('#d_nama').text(item.namaSekolah || '-');
+      $('#d_kab').text(item.kabupaten || '-');
+      $('#d_kec').text(item.kecamatan || '-');
+      $('#d_jenjang').text(item.jenjang || '-');
+
+      const webHtml = item.website ? `<a href="${formatUrl(item.website)}" target="_blank">${item.website}</a>` : '-';
+      const sosmedHtml = item.sosialMedia ? `<a href="${formatUrl(item.sosialMedia)}" target="_blank">${item.sosialMedia}</a>` : '-';
+
+      $('#d_web').html(webHtml);
+      $('#d_sosmed').html(sosmedHtml);
+
+      const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+      modal.show();
+    }
+  </script>
+</body>
+
+</html>
