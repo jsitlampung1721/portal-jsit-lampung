@@ -139,19 +139,12 @@
 
   <!-- LOGIKA APLIKASI -->
   <script>
-    // =========================================================
-    // PASTE URL WEB APP APPS SCRIPT ANDA DI SINI
-    // =========================================================
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxrIJwdC-PNklYGJfj88SD-99uvzdSPSlCboyp-dV4L-yltc_W9cb32n8eMkQJvqP1v/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxiZdv-AOvKXeTcY1hhIN0coUUyZYEYIcdtISX6-EhI6FiSAjEWueJecEj_Jy14rNl3/exec";
 
     let allData = [];
     let dataTable = null;
 
     $(document).ready(function () {
-      if (GAS_URL === "URL_WEB_APP_APPS_SCRIPT_ANDA_DI_SINI") {
-        alert("Harap masukkan URL Web App Apps Script Anda pada variabel GAS_URL!");
-        return;
-      }
       loadData();
 
       $('#kabupaten').on('change', function () {
@@ -164,21 +157,19 @@
     });
 
     function loadData() {
-  fetch(GAS_URL, { redirect: "follow" })
-    .then(res => res.json())
-    .then(data => {
-      allData = data;
-      populateKabupatenDropdown();
-      filterAndDisplayData();
-    })
-    .catch(err => {
-      console.error("Gagal memuat data:", err);
-      alert("Gagal mengambil data dari Google Sheet.");
-    });
-}
+      fetch(GAS_URL, { redirect: "follow" })
+        .then(res => {
+          if (!res.ok) throw new Error("Gagal terhubung ke API Apps Script");
+          return res.json();
+        })
+        .then(data => {
+          allData = data;
+          populateKabupatenDropdown();
+          filterAndDisplayData();
+        })
         .catch(err => {
           console.error("Gagal memuat data:", err);
-          alert("Gagal mengambil data dari Google Sheet.");
+          alert("Gagal mengambil data dari Google Sheet. Pastikan akses Web App sudah diatur ke 'Anyone'.");
         });
     }
 
@@ -240,17 +231,17 @@
       tbody.empty();
 
       data.forEach((item, index) => {
-        const webLink = item.website ? `<a href="${formatUrl(item.website)}" target="_blank" class="btn btn-sm btn-outline-primary">Web</a>` : '-';
-        const sosmedLink = item.sosialMedia ? `<a href="${formatUrl(item.sosialMedia)}" target="_blank" class="btn btn-sm btn-outline-info">Medsos</a>` : '-';
+        const webLink = (item.website && item.website !== '-') ? `<a href="${formatUrl(item.website)}" target="_blank" class="btn btn-sm btn-outline-primary">Web</a>` : '-';
+        const sosmedLink = (item.sosialMedia && item.sosialMedia !== '-') ? `<a href="${formatUrl(item.sosialMedia)}" target="_blank" class="btn btn-sm btn-outline-info">Medsos</a>` : '-';
 
         const row = `
           <tr>
             <td>${index + 1}</td>
-            <td>${item.noKeanggotaan}</td>
-            <td><strong>${item.namaSekolah}</strong></td>
-            <td>${item.kabupaten}</td>
-            <td>${item.kecamatan}</td>
-            <td><span class="badge bg-secondary">${item.jenjang}</span></td>
+            <td>${item.noKeanggotaan || '-'}</td>
+            <td><strong>${item.namaSekolah || '-'}</strong></td>
+            <td>${item.kabupaten || '-'}</td>
+            <td>${item.kecamatan || '-'}</td>
+            <td><span class="badge bg-secondary">${item.jenjang || '-'}</span></td>
             <td>${webLink}</td>
             <td>${sosmedLink}</td>
             <td>
@@ -295,8 +286,8 @@
       $('#d_kec').text(item.kecamatan || '-');
       $('#d_jenjang').text(item.jenjang || '-');
 
-      const webHtml = item.website ? `<a href="${formatUrl(item.website)}" target="_blank">${item.website}</a>` : '-';
-      const sosmedHtml = item.sosialMedia ? `<a href="${formatUrl(item.sosialMedia)}" target="_blank">${item.sosialMedia}</a>` : '-';
+      const webHtml = (item.website && item.website !== '-') ? `<a href="${formatUrl(item.website)}" target="_blank">${item.website}</a>` : '-';
+      const sosmedHtml = (item.sosialMedia && item.sosialMedia !== '-') ? `<a href="${formatUrl(item.sosialMedia)}" target="_blank">${item.sosialMedia}</a>` : '-';
 
       $('#d_web').html(webHtml);
       $('#d_sosmed').html(sosmedHtml);
