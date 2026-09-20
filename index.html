@@ -11,12 +11,14 @@
   <!-- DataTables CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+  <!-- DataTables Buttons CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
     :root {
-      --jsit-blue: #0055bd; /* Warna biru sesuai sampel */
+      --jsit-blue: #0055bd;
       --jsit-blue-hover: #004397;
     }
 
@@ -26,7 +28,7 @@
     }
 
     .logo-jsit {
-      max-height: 95px;
+      max-height: 90px;
       width: auto;
     }
 
@@ -69,7 +71,7 @@
       border: none;
     }
 
-    /* ELEMEN TEMA BIRU */
+    /* KUSTOMISASI TEMA BIRU */
     .bg-jsit-blue {
       background-color: var(--jsit-blue) !important;
       color: #ffffff !important;
@@ -99,12 +101,58 @@
       background-color: var(--jsit-blue);
       color: #ffffff;
     }
+
+    /* MENGHILANGKAN PANAH SORTING DATATABLES */
+    table.dataTable thead .sorting,
+    table.dataTable thead .sorting_asc,
+    table.dataTable thead .sorting_desc,
+    table.dataTable thead .sorting_asc_disabled,
+    table.dataTable thead .sorting_desc_disabled {
+      background-image: none !important;
+      cursor: default !important;
+    }
+
+    table.dataTable thead th::before,
+    table.dataTable thead th::after,
+    table.dataTable thead td::before,
+    table.dataTable thead td::after {
+      display: none !important;
+      content: "" !important;
+    }
+
+    /* STATISTIK CARDS */
+    .stat-card {
+      border-left: 4px solid var(--jsit-blue);
+      transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .stat-icon {
+      font-size: 2rem;
+      opacity: 0.8;
+    }
   </style>
 </head>
 
 <body>
 
   <div class="container py-4">
+
+    <!-- BARIS ATAS: TOMBOL ADMIN LOGIN -->
+    <div class="d-flex justify-content-end mb-2">
+      <button id="btnAdminModal" class="btn btn-sm btn-outline-jsit-blue" data-bs-toggle="modal" data-bs-target="#loginModal">
+        <i class="fa-solid fa-user-lock me-1"></i> Admin Login
+      </button>
+      <div id="adminBadge" class="d-none align-items-center gap-2">
+        <span class="badge bg-success"><i class="fa-solid fa-user-check me-1"></i> Admin Active</span>
+        <button class="btn btn-sm btn-outline-danger" onclick="logoutAdmin()">
+          <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+        </button>
+      </div>
+    </div>
 
     <!-- HEADER -->
     <div class="card shadow-sm">
@@ -148,12 +196,82 @@
       </div>
     </div>
 
+    <!-- DASHBOARD STATISTIK (Hanya muncul untuk Admin atau setelah pencarian) -->
+    <div id="dashboardSection" class="mt-4" style="display: none;">
+      <div class="d-flex align-items-center mb-3">
+        <h5 class="fw-bold text-jsit-blue m-0"><i class="fa-solid fa-chart-pie me-2"></i>Dashboard Data SIT</h5>
+        <span id="wilayahLabel" class="ms-2 badge bg-secondary">Seluruh Lampung</span>
+      </div>
+      <div class="row g-3">
+        <!-- Total SIT -->
+        <div class="col-6 col-md-4 col-lg">
+          <div class="card shadow-sm stat-card p-3">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <small class="text-muted fw-bold d-block">TOTAL SIT</small>
+                <h3 id="statTotal" class="fw-bold m-0 text-jsit-blue">0</h3>
+              </div>
+              <i class="fa-solid fa-school stat-icon text-jsit-blue"></i>
+            </div>
+          </div>
+        </div>
+        <!-- PAUDIT / TKIT -->
+        <div class="col-6 col-md-4 col-lg">
+          <div class="card shadow-sm stat-card p-3" style="border-left-color: #ffc107;">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <small class="text-muted fw-bold d-block">TKIT / PAUDIT</small>
+                <h3 id="statTK" class="fw-bold m-0 text-warning">0</h3>
+              </div>
+              <i class="fa-solid fa-child stat-icon text-warning"></i>
+            </div>
+          </div>
+        </div>
+        <!-- SDIT -->
+        <div class="col-6 col-md-4 col-lg">
+          <div class="card shadow-sm stat-card p-3" style="border-left-color: #198754;">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <small class="text-muted fw-bold d-block">SDIT / MI</small>
+                <h3 id="statSD" class="fw-bold m-0 text-success">0</h3>
+              </div>
+              <i class="fa-solid fa-book-open stat-icon text-success"></i>
+            </div>
+          </div>
+        </div>
+        <!-- SMPIT -->
+        <div class="col-6 col-md-6 col-lg">
+          <div class="card shadow-sm stat-card p-3" style="border-left-color: #0dcaf0;">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <small class="text-muted fw-bold d-block">SMPIT / MTs</small>
+                <h3 id="statSMP" class="fw-bold m-0 text-info">0</h3>
+              </div>
+              <i class="fa-solid fa-graduation-cap stat-icon text-info"></i>
+            </div>
+          </div>
+        </div>
+        <!-- SMAIT -->
+        <div class="col-12 col-md-6 col-lg">
+          <div class="card shadow-sm stat-card p-3" style="border-left-color: #6f42c1;">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <small class="text-muted fw-bold d-block">SMAIT / MA</small>
+                <h3 id="statSMA" class="fw-bold m-0" style="color:#6f42c1;">0</h3>
+              </div>
+              <i class="fa-solid fa-user-graduate stat-icon" style="color:#6f42c1;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- HASIL PENCARIAN (Default Hidden) -->
     <div id="hasilPencarian" class="mt-4" style="display:none;">
       <div class="card shadow-sm">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="m-0 fw-bold text-jsit-blue">Hasil Pencarian</h5>
+            <h5 class="m-0 fw-bold text-jsit-blue"><i class="fa-solid fa-table-list me-2"></i>Data SIT</h5>
             <span id="jumlahData" class="badge bg-jsit-blue fs-6">0 Data</span>
           </div>
 
@@ -177,6 +295,34 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- MODAL LOGIN ADMIN -->
+  <div class="modal fade" id="loginModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+        <div class="modal-header bg-jsit-blue text-white">
+          <h5 class="modal-title fs-6 fw-bold"><i class="fa-solid fa-user-shield me-1"></i> Login Admin</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-3">
+          <form id="formLogin">
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-secondary">Username</label>
+              <input type="text" id="adminUser" class="form-control form-control-sm" placeholder="Masukkan Username" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-secondary">Password</label>
+              <input type="password" id="adminPass" class="form-control form-control-sm" placeholder="Masukkan Password" required>
+            </div>
+            <div id="loginError" class="text-danger small mb-2 text-center" style="display:none;">
+              Username atau Password salah!
+            </div>
+            <button type="submit" class="btn btn-jsit-blue w-100 btn-sm fw-bold">Login</button>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- MODAL DETAIL -->
@@ -213,12 +359,21 @@
   <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 
+  <!-- JS Export Buttons -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
   <!-- LOGIKA APLIKASI -->
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxiZdv-AOvKXeTcY1hhIN0coUUyZYEYIcdtISX6-EhI6FiSAjEWueJecEj_Jy14rNl3/exec";
 
     let allData = [];
     let dataTable = null;
+    let isAdminLoggedIn = false;
 
     $(document).ready(function () {
       loadData();
@@ -230,7 +385,53 @@
       $('#btnCari').on('click', function () {
         filterAndDisplayData();
       });
+
+      // Submit Login Form
+      $('#formLogin').on('submit', function (e) {
+        e.preventDefault();
+        const u = $('#adminUser').val().trim();
+        const p = $('#adminPass').val().trim();
+
+        if (u === 'admin' && p === 'admin123') {
+          isAdminLoggedIn = true;
+          $('#loginError').hide();
+          $('#formLogin')[0].reset();
+          
+          const modalEl = document.getElementById('loginModal');
+          const modal = bootstrap.Modal.getInstance(modalEl);
+          modal.hide();
+
+          $('#btnAdminModal').addClass('d-none');
+          $('#adminBadge').removeClass('d-none').addClass('d-flex');
+
+          // Tampilkan dashboard
+          $('#dashboardSection').slideDown();
+          updateDashboardStats(allData, "Seluruh Lampung");
+
+          // Refresh tabel jika sudah ada data terfilter
+          if ($('#hasilPencarian').is(':visible')) {
+            filterAndDisplayData();
+          }
+        } else {
+          $('#loginError').show();
+        }
+      });
     });
+
+    function logoutAdmin() {
+      isAdminLoggedIn = false;
+      $('#btnAdminModal').removeClass('d-none');
+      $('#adminBadge').addClass('d-none').removeClass('d-flex');
+      
+      // Jika hasil pencarian belum dilakukan, sembunyikan dashboard lagi
+      if (!$('#hasilPencarian').is(':visible')) {
+        $('#dashboardSection').slideUp();
+      }
+      
+      if ($('#hasilPencarian').is(':visible')) {
+        filterAndDisplayData();
+      }
+    }
 
     function loadData() {
       fetch(GAS_URL, { redirect: "follow" })
@@ -303,7 +504,47 @@
         return matchKab && matchKec;
       });
 
+      // Label Wilayah
+      let labelWilayah = "Seluruh Lampung";
+      if (kab !== 'ALL') {
+        labelWilayah = kab;
+        if (kec !== 'ALL') {
+          labelWilayah += ` - Kec. ${kec}`;
+        }
+      }
+
+      $('#dashboardSection').slideDown();
+      updateDashboardStats(filtered, labelWilayah);
       renderTable(filtered);
+    }
+
+    function updateDashboardStats(dataList, labelWilayah) {
+      $('#wilayahLabel').text(labelWilayah);
+
+      let total = dataList.length;
+      let tk = 0, sd = 0, smp = 0, sma = 0;
+
+      dataList.forEach(item => {
+        const str = ((item.jenjang || '') + ' ' + (item.namaSekolah || '')).toUpperCase();
+
+        if (str.includes('TK') || str.includes('PAUD') || str.includes('RA') || str.includes('KB')) {
+          tk++;
+        } else if (str.includes('SD') || str.includes('MI')) {
+          sd++;
+        } else if (str.includes('SMP') || str.includes('MTS')) {
+          smp++;
+        } else if (str.includes('SMA') || str.includes('MA') || str.includes('SMK')) {
+          sma++;
+        } else {
+          sd++; // default fallback
+        }
+      });
+
+      $('#statTotal').text(total);
+      $('#statTK').text(tk);
+      $('#statSD').text(sd);
+      $('#statSMP').text(smp);
+      $('#statSMA').text(sma);
     }
 
     function renderTable(data) {
@@ -339,8 +580,32 @@
         tbody.append(row);
       });
 
+      // PENGATURAN DATATABLE DENGAN ATAU TANPA TOMBOL EXPORT
+      let dtButtons = [];
+      if (isAdminLoggedIn) {
+        dtButtons = [
+          {
+            extend: 'excelHtml5',
+            className: 'btn btn-sm btn-success fw-bold me-1 mb-2',
+            text: '<i class="fa-solid fa-file-excel me-1"></i> Unduh Excel',
+            title: 'Data SIT Lampung'
+          },
+          {
+            extend: 'pdfHtml5',
+            className: 'btn btn-sm btn-danger fw-bold mb-2',
+            text: '<i class="fa-solid fa-file-pdf me-1"></i> Unduh PDF',
+            title: 'Data SIT Lampung',
+            orientation: 'landscape',
+            pageSize: 'A4'
+          }
+        ];
+      }
+
       dataTable = $('#tabelSekolah').DataTable({
         responsive: true,
+        ordering: false, // Menghilangkan fitur & panah pengurutan
+        dom: isAdminLoggedIn ? '<"d-flex justify-content-between align-items-center flex-wrap mb-2"Bf>rtip' : 'frtip',
+        buttons: dtButtons,
         language: {
           search: "Cari Cepat:",
           lengthMenu: "Tampilkan _MENU_ data",
