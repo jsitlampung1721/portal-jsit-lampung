@@ -18,7 +18,7 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .logo-jsit {
-      max-height: 90px;
+      max-height: 100px;
       width: auto;
     }
     .portal-title {
@@ -43,7 +43,8 @@
     <div class="card shadow-sm border-0">
       <div class="card-body p-4">
         <div class="text-center">
-          <img src="https://lh3.googleusercontent.com/d/1F-GDZRu4OhHQAV-pX5yPWGYtIn9W2rvQ/" class="logo-jsit" alt="Logo JSIT">
+          <!-- LOGO GOOGLE DRIVE DIRECT LINK -->
+          <img src="https://lh3.googleusercontent.com/d/1F7e5q5JbS2RkKS5Wdn2jJLq0qTeUITPv" class="logo-jsit" alt="Logo JSIT Lampung">
           <h2 class="portal-title mt-3">PORTAL DATA SIT LAMPUNG</h2>
           <p class="portal-subtitle">Jaringan Sekolah Islam Terpadu Lampung</p>
         </div>
@@ -53,14 +54,14 @@
           <div class="col-md-5 mb-3">
             <label class="form-label fw-bold">Kabupaten / Kota</label>
             <select id="kabupaten" class="form-select">
-              <option value="ALL">Memuat Data...</option>
+              <option value="ALL">Memuat Wilayah...</option>
             </select>
           </div>
 
           <div class="col-md-5 mb-3">
             <label class="form-label fw-bold">Kecamatan</label>
             <select id="kecamatan" class="form-select">
-              <option value="ALL">ALL</option>
+              <option value="ALL">ALL (Semua Kecamatan)</option>
             </select>
           </div>
 
@@ -72,7 +73,7 @@
       </div>
     </div>
 
-    <!-- HASIL PENCARIAN -->
+    <!-- HASIL PENCARIAN (Sembunyi secara default) -->
     <div id="hasilPencarian" class="mt-4" style="display:none;">
       <div class="card shadow-sm border-0">
         <div class="card-body">
@@ -145,12 +146,15 @@
     let dataTable = null;
 
     $(document).ready(function () {
+      // Ambil data untuk opsi dropdown
       loadData();
 
+      // Event saat Kabupaten/Kota diganti
       $('#kabupaten').on('change', function () {
         updateKecamatanDropdown();
       });
 
+      // Event saat tombol Cari diklik
       $('#btnCari').on('click', function () {
         filterAndDisplayData();
       });
@@ -165,18 +169,19 @@
         .then(data => {
           allData = data;
           populateKabupatenDropdown();
-          filterAndDisplayData();
         })
         .catch(err => {
           console.error("Gagal memuat data:", err);
-          alert("Gagal mengambil data dari Google Sheet. Pastikan akses Web App sudah diatur ke 'Anyone'.");
+          alert("Gagal mengambil data dari Google Sheet.");
         });
     }
 
     function populateKabupatenDropdown() {
       const kabSet = new Set();
       allData.forEach(item => {
-        if (item.kabupaten) kabSet.add(item.kabupaten.trim());
+        if (item.kabupaten && item.kabupaten.trim() !== "") {
+          kabSet.add(item.kabupaten.trim());
+        }
       });
 
       let options = '<option value="ALL">ALL (Semua Kabupaten/Kota)</option>';
@@ -193,8 +198,10 @@
       const kecSet = new Set();
 
       allData.forEach(item => {
-        if (selectedKab === 'ALL' || item.kabupaten === selectedKab) {
-          if (item.kecamatan) kecSet.add(item.kecamatan.trim());
+        if (selectedKab === 'ALL' || item.kabupaten.trim() === selectedKab) {
+          if (item.kecamatan && item.kecamatan.trim() !== "") {
+            kecSet.add(item.kecamatan.trim());
+          }
         }
       });
 
@@ -207,12 +214,20 @@
     }
 
     function filterAndDisplayData() {
+      if (!allData || allData.length === 0) {
+        alert("Data masih dimuat dari server, silakan tunggu beberapa detik lalu klik Cari lagi.");
+        return;
+      }
+
       const kab = $('#kabupaten').val();
       const kec = $('#kecamatan').val();
 
       const filtered = allData.filter(item => {
-        const matchKab = (kab === 'ALL' || !kab) ? true : item.kabupaten === kab;
-        const matchKec = (kec === 'ALL' || !kec) ? true : item.kecamatan === kec;
+        const itemKab = item.kabupaten ? item.kabupaten.trim() : "";
+        const itemKec = item.kecamatan ? item.kecamatan.trim() : "";
+
+        const matchKab = (kab === 'ALL' || !kab) ? true : itemKab === kab;
+        const matchKec = (kec === 'ALL' || !kec) ? true : itemKec === kec;
         return matchKab && matchKec;
       });
 
