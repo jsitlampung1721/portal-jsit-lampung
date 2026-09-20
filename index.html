@@ -134,6 +134,23 @@
       font-size: 2rem;
       opacity: 0.8;
     }
+
+    .clickable-card {
+      cursor: pointer;
+    }
+
+    .clickable-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+
+    /* NAV ADMIN */
+    .nav-pills .nav-link.active {
+      background-color: var(--jsit-blue);
+    }
+
+    .nav-pills .nav-link {
+      color: #555;
+    }
   </style>
 </head>
 
@@ -141,51 +158,46 @@
 
   <div class="container py-4">
 
-    <!-- BARIS ATAS: TOMBOL ADMIN LOGIN -->
+    <!-- BARIS ATAS: TOMBOL ADMIN LOGIN (Hanya Ikon) -->
     <div class="d-flex justify-content-end mb-2">
-      <button id="btnAdminModal" class="btn btn-sm btn-outline-jsit-blue" data-bs-toggle="modal" data-bs-target="#loginModal">
-        <i class="fa-solid fa-user-lock me-1"></i> Admin Login
+      <button id="btnAdminModal" class="btn btn-sm btn-outline-jsit-blue rounded-circle p-2" data-bs-toggle="modal" data-bs-target="#loginModal" title="Admin Login" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+        <i class="fa-solid fa-user-lock"></i>
       </button>
+
       <div id="adminBadge" class="d-none align-items-center gap-2">
-        <span class="badge bg-success"><i class="fa-solid fa-user-check me-1"></i> Admin Active</span>
-        <button class="btn btn-sm btn-outline-danger" onclick="logoutAdmin()">
-          <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+        <span class="badge bg-success p-2"><i class="fa-solid fa-user-check me-1"></i> Admin Active</span>
+        <button class="btn btn-sm btn-outline-danger" onclick="logoutAdmin()" title="Logout">
+          <i class="fa-solid fa-right-from-bracket me-1"></i> Keluar
         </button>
       </div>
     </div>
 
     <!-- HEADER -->
-    <div class="card shadow-sm">
+    <div class="card shadow-sm mb-4">
       <div class="card-body p-4">
         <div class="text-center">
-          <!-- LOGO JSIT -->
           <img src="https://lh3.googleusercontent.com/d/1F7e5q5JbS2RkKS5Wdn2jJLq0qTeUITPv" class="logo-jsit" alt="Logo JSIT Lampung">
-          
           <h2 class="portal-title mt-3">PORTAL DATA SIT LAMPUNG</h2>
           <p class="portal-subtitle mb-2">Jaringan Sekolah Islam Terpadu Lampung</p>
-          
-          <!-- SIGER DIVIDER -->
           <div class="siger-divider">
             <img src="https://lh3.googleusercontent.com/d/1bVdLeMaB73lAxhenTx1zuiIG0EPhimTm" class="siger-img" alt="Ikon Siger Lampung">
           </div>
         </div>
 
-        <!-- FILTER -->
-        <div class="row mt-3">
+        <!-- FILTER PUBLIK (Hanya tampil jika bukan di menu admin) -->
+        <div id="publicFilterSection" class="row mt-3">
           <div class="col-md-5 mb-3">
             <label class="form-label fw-bold text-secondary">Kabupaten / Kota</label>
             <select id="kabupaten" class="form-select">
               <option value="ALL">Memuat Wilayah...</option>
             </select>
           </div>
-
           <div class="col-md-5 mb-3">
             <label class="form-label fw-bold text-secondary">Kecamatan</label>
             <select id="kecamatan" class="form-select">
               <option value="ALL">ALL (Semua Kecamatan)</option>
             </select>
           </div>
-
           <div class="col-md-2 mb-3 d-grid">
             <label class="form-label">&nbsp;</label>
             <button id="btnCari" class="btn btn-jsit-blue fw-bold">
@@ -196,86 +208,196 @@
       </div>
     </div>
 
-    <!-- DASHBOARD STATISTIK (Hanya muncul untuk Admin atau setelah pencarian) -->
-    <div id="dashboardSection" class="mt-4" style="display: none;">
+    <!-- MENU NAVIGASI ADMIN (Hanya muncul saat Admin Login) -->
+    <div id="adminNavSection" class="d-none mb-4">
+      <ul class="nav nav-pills nav-fill bg-white p-2 rounded shadow-sm border">
+        <li class="nav-item">
+          <button class="nav-link active fw-bold" id="tabDashboardBtn" onclick="switchAdminTab('dashboard')">
+            <i class="fa-solid fa-chart-pie me-2"></i>Dashboard Utama
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link fw-bold" id="tabDapoBtn" onclick="switchAdminTab('dapo')">
+            <i class="fa-solid fa-database me-2"></i>DapoSIT (Data Wilayah)
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- HALAMAN ADMIN 1: DASHBOARD (STATISTIK ONLY - TANPA TABEL) -->
+    <div id="adminDashboardPage" class="d-none">
       <div class="d-flex align-items-center mb-3">
-        <h5 class="fw-bold text-jsit-blue m-0"><i class="fa-solid fa-chart-pie me-2"></i>Dashboard Data SIT</h5>
-        <span id="wilayahLabel" class="ms-2 badge bg-secondary">Seluruh Lampung</span>
+        <h5 class="fw-bold text-jsit-blue m-0"><i class="fa-solid fa-chart-line me-2"></i>Ringkasan Total SIT Lampung</h5>
       </div>
-      <div class="row g-3">
-        <!-- Total SIT -->
+      
+      <!-- CARDS RINGKASAN JENJANG -->
+      <div class="row g-3 mb-4">
         <div class="col-6 col-md-4 col-lg">
           <div class="card shadow-sm stat-card p-3">
             <div class="d-flex align-items-center justify-content-between">
               <div>
                 <small class="text-muted fw-bold d-block">TOTAL SIT</small>
-                <h3 id="statTotal" class="fw-bold m-0 text-jsit-blue">0</h3>
+                <h3 id="dashTotal" class="fw-bold m-0 text-jsit-blue">0</h3>
               </div>
               <i class="fa-solid fa-school stat-icon text-jsit-blue"></i>
             </div>
           </div>
         </div>
-        <!-- PAUDIT / TKIT -->
         <div class="col-6 col-md-4 col-lg">
           <div class="card shadow-sm stat-card p-3" style="border-left-color: #ffc107;">
             <div class="d-flex align-items-center justify-content-between">
               <div>
                 <small class="text-muted fw-bold d-block">TKIT / PAUDIT</small>
-                <h3 id="statTK" class="fw-bold m-0 text-warning">0</h3>
+                <h3 id="dashTK" class="fw-bold m-0 text-warning">0</h3>
               </div>
               <i class="fa-solid fa-child stat-icon text-warning"></i>
             </div>
           </div>
         </div>
-        <!-- SDIT -->
         <div class="col-6 col-md-4 col-lg">
           <div class="card shadow-sm stat-card p-3" style="border-left-color: #198754;">
             <div class="d-flex align-items-center justify-content-between">
               <div>
                 <small class="text-muted fw-bold d-block">SDIT / MI</small>
-                <h3 id="statSD" class="fw-bold m-0 text-success">0</h3>
+                <h3 id="dashSD" class="fw-bold m-0 text-success">0</h3>
               </div>
               <i class="fa-solid fa-book-open stat-icon text-success"></i>
             </div>
           </div>
         </div>
-        <!-- SMPIT -->
         <div class="col-6 col-md-6 col-lg">
           <div class="card shadow-sm stat-card p-3" style="border-left-color: #0dcaf0;">
             <div class="d-flex align-items-center justify-content-between">
               <div>
                 <small class="text-muted fw-bold d-block">SMPIT / MTs</small>
-                <h3 id="statSMP" class="fw-bold m-0 text-info">0</h3>
+                <h3 id="dashSMP" class="fw-bold m-0 text-info">0</h3>
               </div>
               <i class="fa-solid fa-graduation-cap stat-icon text-info"></i>
             </div>
           </div>
         </div>
-        <!-- SMAIT -->
         <div class="col-12 col-md-6 col-lg">
           <div class="card shadow-sm stat-card p-3" style="border-left-color: #6f42c1;">
             <div class="d-flex align-items-center justify-content-between">
               <div>
                 <small class="text-muted fw-bold d-block">SMAIT / MA</small>
-                <h3 id="statSMA" class="fw-bold m-0" style="color:#6f42c1;">0</h3>
+                <h3 id="dashSMA" class="fw-bold m-0" style="color:#6f42c1;">0</h3>
               </div>
               <i class="fa-solid fa-user-graduate stat-icon" style="color:#6f42c1;"></i>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- KARTU PERSEBARAN WILAYAH -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-jsit-blue text-white fw-bold">
+          <i class="fa-solid fa-map-location-dot me-2"></i>Persebaran SIT per Kabupaten / Kota
+        </div>
+        <div class="card-body">
+          <div id="kabupatenGrid" class="row g-3">
+            <!-- Grid Kabupaten diisi secara otomatis lewat JS -->
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- HASIL PENCARIAN (Default Hidden) -->
-    <div id="hasilPencarian" class="mt-4" style="display:none;">
+    <!-- HALAMAN ADMIN 2: DAPOSIT (FILTER WILAYAH, STATISTIK DETIL, & EXPORT EXCEL/PDF) -->
+    <div id="adminDapoPage" class="d-none">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h5 class="fw-bold text-jsit-blue mb-3"><i class="fa-solid fa-filter me-2"></i>Filter DapoSIT Wilayah</h5>
+          <div class="row">
+            <div class="col-md-5 mb-2">
+              <label class="form-label fw-bold small text-secondary">Pilih Kabupaten / Kota</label>
+              <select id="dapoKabupaten" class="form-select"></select>
+            </div>
+            <div class="col-md-5 mb-2">
+              <label class="form-label fw-bold small text-secondary">Pilih Kecamatan</label>
+              <select id="dapoKecamatan" class="form-select"></select>
+            </div>
+            <div class="col-md-2 mb-2 d-grid">
+              <label class="form-label small">&nbsp;</label>
+              <button id="btnFilterDapo" class="btn btn-jsit-blue fw-bold">
+                <i class="fa-solid fa-magnifying-glass me-1"></i> Tampilkan
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATISTIK DAPOSIT KOTA/KECAMATAN TERPILIH -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-lg" onclick="filterByJenjangDapo('ALL')">
+          <div class="card shadow-sm stat-card p-3 clickable-card">
+            <small class="text-muted fw-bold d-block">TOTAL SIT</small>
+            <h3 id="dapoStatTotal" class="fw-bold m-0 text-jsit-blue">0</h3>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg" onclick="filterByJenjangDapo('TK')">
+          <div class="card shadow-sm stat-card p-3 clickable-card" style="border-left-color: #ffc107;">
+            <small class="text-muted fw-bold d-block">TKIT / PAUDIT</small>
+            <h3 id="dapoStatTK" class="fw-bold m-0 text-warning">0</h3>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg" onclick="filterByJenjangDapo('SD')">
+          <div class="card shadow-sm stat-card p-3 clickable-card" style="border-left-color: #198754;">
+            <small class="text-muted fw-bold d-block">SDIT / MI</small>
+            <h3 id="dapoStatSD" class="fw-bold m-0 text-success">0</h3>
+          </div>
+        </div>
+        <div class="col-6 col-md-6 col-lg" onclick="filterByJenjangDapo('SMP')">
+          <div class="card shadow-sm stat-card p-3 clickable-card" style="border-left-color: #0dcaf0;">
+            <small class="text-muted fw-bold d-block">SMPIT / MTs</small>
+            <h3 id="dapoStatSMP" class="fw-bold m-0 text-info">0</h3>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg" onclick="filterByJenjangDapo('SMA')">
+          <div class="card shadow-sm stat-card p-3 clickable-card" style="border-left-color: #6f42c1;">
+            <small class="text-muted fw-bold d-block">SMAIT / MA</small>
+            <h3 id="dapoStatSMA" class="fw-bold m-0" style="color:#6f42c1;">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABEL DAPOSIT DENGAN TOMBOL EXCEL & PDF -->
       <div class="card shadow-sm">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="m-0 fw-bold text-jsit-blue"><i class="fa-solid fa-table-list me-2"></i>Data SIT</h5>
-            <span id="jumlahData" class="badge bg-jsit-blue fs-6">0 Data</span>
+            <h5 class="m-0 fw-bold text-jsit-blue"><i class="fa-solid fa-list-check me-2"></i>Data Real DapoSIT</h5>
+            <span id="dapoJumlahData" class="badge bg-jsit-blue fs-6">0 Data</span>
           </div>
 
-          <table id="tabelSekolah" class="display responsive nowrap w-100">
+          <table id="tabelDapo" class="display responsive nowrap w-100">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>No Keanggotaan</th>
+                <th>Nama Sekolah</th>
+                <th>Kabupaten/Kota</th>
+                <th>Kecamatan</th>
+                <th>Jenjang</th>
+                <th>Website</th>
+                <th>Sosial Media</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABEL HASIL PENCARIAN PUBLIK -->
+    <div id="hasilPencarianPublic" class="mt-4" style="display:none;">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="m-0 fw-bold text-jsit-blue"><i class="fa-solid fa-table-list me-2"></i>Hasil Pencarian SIT</h5>
+            <span id="jumlahDataPublic" class="badge bg-jsit-blue fs-6">0 Data</span>
+          </div>
+
+          <table id="tabelPublic" class="display responsive nowrap w-100">
             <thead>
               <tr>
                 <th>No</th>
@@ -302,7 +424,7 @@
     <div class="modal-dialog modal-dialog-centered modal-sm">
       <div class="modal-content">
         <div class="modal-header bg-jsit-blue text-white">
-          <h5 class="modal-title fs-6 fw-bold"><i class="fa-solid fa-user-shield me-1"></i> Login Admin</h5>
+          <h5 class="modal-title fs-6 fw-bold"><i class="fa-solid fa-user-shield me-2"></i>Login Admin</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body p-3">
@@ -329,7 +451,7 @@
   <div class="modal fade" id="detailModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header bg-jsit-blue">
+        <div class="modal-header bg-jsit-blue text-white">
           <h5 class="modal-title fw-bold">Detail Sekolah</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
@@ -349,7 +471,7 @@
   </div>
 
   <!-- FOOTER -->
-  <footer class="text-center mt-4 mb-4 text-muted">
+  <footer class="text-center mt-5 mb-4 text-muted">
     <small>© Portal Data SIT Lampung</small>
   </footer>
 
@@ -365,53 +487,79 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
   <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
   <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
 
   <!-- LOGIKA APLIKASI -->
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxiZdv-AOvKXeTcY1hhIN0coUUyZYEYIcdtISX6-EhI6FiSAjEWueJecEj_Jy14rNl3/exec";
 
+    // HASH SHA-256 TERPROTEKSI DARI INSPECT ELEMENT
+    // username: "admin"
+    const USER_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
+    // password: "admin123"
+    const PASS_HASH = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9";
+
     let allData = [];
-    let dataTable = null;
+    let publicTable = null;
+    let dapoTable = null;
     let isAdminLoggedIn = false;
+    let currentDapoFilteredData = [];
+
+    // Helper Fungsi Hash SHA-256
+    async function hashString(str) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(str);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 
     $(document).ready(function () {
       loadData();
 
+      // Dropdown publik Listener
       $('#kabupaten').on('change', function () {
-        updateKecamatanDropdown();
+        updateKecamatanDropdown('#kabupaten', '#kecamatan');
+      });
+
+      // Dropdown DapoSIT Listener
+      $('#dapoKabupaten').on('change', function () {
+        updateKecamatanDropdown('#dapoKabupaten', '#dapoKecamatan');
       });
 
       $('#btnCari').on('click', function () {
-        filterAndDisplayData();
+        filterPublicData();
       });
 
-      // Submit Login Form
-      $('#formLogin').on('submit', function (e) {
-        e.preventDefault();
-        const u = $('#adminUser').val().trim();
-        const p = $('#adminPass').val().trim();
+      $('#btnFilterDapo').on('click', function () {
+        filterDapoData();
+      });
 
-        if (u === 'admin' && p === 'admin123') {
+      // Form Login Admin dengan HASH Verification
+      $('#formLogin').on('submit', async function (e) {
+        e.preventDefault();
+        const uInput = $('#adminUser').val().trim();
+        const pInput = $('#adminPass').val().trim();
+
+        const uHash = await hashString(uInput);
+        const pHash = await hashString(pInput);
+
+        if (uHash === USER_HASH && pHash === PASS_HASH) {
           isAdminLoggedIn = true;
           $('#loginError').hide();
           $('#formLogin')[0].reset();
-          
+
           const modalEl = document.getElementById('loginModal');
           const modal = bootstrap.Modal.getInstance(modalEl);
           modal.hide();
 
+          // Tampilan UI Admin
           $('#btnAdminModal').addClass('d-none');
           $('#adminBadge').removeClass('d-none').addClass('d-flex');
+          $('#publicFilterSection').addClass('d-none');
+          $('#hasilPencarianPublic').hide();
+          $('#adminNavSection').removeClass('d-none');
 
-          // Tampilkan dashboard
-          $('#dashboardSection').slideDown();
-          updateDashboardStats(allData, "Seluruh Lampung");
-
-          // Refresh tabel jika sudah ada data terfilter
-          if ($('#hasilPencarian').is(':visible')) {
-            filterAndDisplayData();
-          }
+          switchAdminTab('dashboard');
         } else {
           $('#loginError').show();
         }
@@ -422,34 +570,45 @@
       isAdminLoggedIn = false;
       $('#btnAdminModal').removeClass('d-none');
       $('#adminBadge').addClass('d-none').removeClass('d-flex');
-      
-      // Jika hasil pencarian belum dilakukan, sembunyikan dashboard lagi
-      if (!$('#hasilPencarian').is(':visible')) {
-        $('#dashboardSection').slideUp();
-      }
-      
-      if ($('#hasilPencarian').is(':visible')) {
-        filterAndDisplayData();
+      $('#adminNavSection').addClass('d-none');
+      $('#adminDashboardPage').addClass('d-none');
+      $('#adminDapoPage').addClass('d-none');
+      $('#publicFilterSection').removeClass('d-none');
+    }
+
+    function switchAdminTab(tab) {
+      if (tab === 'dashboard') {
+        $('#tabDashboardBtn').addClass('active');
+        $('#tabDapoBtn').removeClass('active');
+        $('#adminDashboardPage').removeClass('d-none');
+        $('#adminDapoPage').addClass('d-none');
+        renderDashboardStats();
+      } else if (tab === 'dapo') {
+        $('#tabDapoBtn').addClass('active');
+        $('#tabDashboardBtn').removeClass('active');
+        $('#adminDapoPage').removeClass('d-none');
+        $('#adminDashboardPage').addClass('d-none');
+        filterDapoData();
       }
     }
 
     function loadData() {
       fetch(GAS_URL, { redirect: "follow" })
         .then(res => {
-          if (!res.ok) throw new Error("Gagal terhubung ke API Apps Script");
+          if (!res.ok) throw new Error("Gagal terhubung ke API");
           return res.json();
         })
         .then(data => {
           allData = data;
-          populateKabupatenDropdown();
+          populateKabupatenDropdowns();
         })
         .catch(err => {
-          console.error("Gagal memuat data:", err);
-          alert("Gagal mengambil data dari Google Sheet.");
+          console.error("Error:", err);
+          alert("Gagal memuat data dari spreadsheet.");
         });
     }
 
-    function populateKabupatenDropdown() {
+    function populateKabupatenDropdowns() {
       const kabSet = new Set();
       allData.forEach(item => {
         if (item.kabupaten && item.kabupaten.trim() !== "") {
@@ -463,11 +622,14 @@
       });
 
       $('#kabupaten').html(options);
-      updateKecamatanDropdown();
+      $('#dapoKabupaten').html(options);
+
+      updateKecamatanDropdown('#kabupaten', '#kecamatan');
+      updateKecamatanDropdown('#dapoKabupaten', '#dapoKecamatan');
     }
 
-    function updateKecamatanDropdown() {
-      const selectedKab = $('#kabupaten').val();
+    function updateKecamatanDropdown(kabSelector, kecSelector) {
+      const selectedKab = $(kabSelector).val();
       const kecSet = new Set();
 
       allData.forEach(item => {
@@ -483,79 +645,117 @@
         options += `<option value="${kec}">${kec}</option>`;
       });
 
-      $('#kecamatan').html(options);
+      $(kecSelector).html(options);
     }
 
-    function filterAndDisplayData() {
-      if (!allData || allData.length === 0) {
-        alert("Data masih dimuat dari server, silakan tunggu sebentar lalu klik Cari lagi.");
-        return;
-      }
+    // --- LOGIKA DASHBOARD UTAMA (TANPA TABEL) ---
+    function renderDashboardStats() {
+      let total = allData.length;
+      let tk = 0, sd = 0, smp = 0, sma = 0;
+      const kabCounts = {};
 
-      const kab = $('#kabupaten').val();
-      const kec = $('#kecamatan').val();
+      allData.forEach(item => {
+        const str = ((item.jenjang || '') + ' ' + (item.namaSekolah || '')).toUpperCase();
+        if (str.includes('TK') || str.includes('PAUD') || str.includes('RA') || str.includes('KB')) tk++;
+        else if (str.includes('SD') || str.includes('MI')) sd++;
+        else if (str.includes('SMP') || str.includes('MTS')) smp++;
+        else if (str.includes('SMA') || str.includes('MA') || str.includes('SMK')) sma++;
+        else sd++;
 
-      const filtered = allData.filter(item => {
+        const kab = item.kabupaten ? item.kabupaten.trim() : 'Lainnya';
+        kabCounts[kab] = (kabCounts[kab] || 0) + 1;
+      });
+
+      $('#dashTotal').text(total);
+      $('#dashTK').text(tk);
+      $('#dashSD').text(sd);
+      $('#dashSMP').text(smp);
+      $('#dashSMA').text(sma);
+
+      // Render Grid Kabupaten
+      let gridHtml = '';
+      Object.keys(kabCounts).sort().forEach(kab => {
+        gridHtml += `
+          <div class="col-md-4 col-sm-6">
+            <div class="p-3 bg-light rounded border d-flex justify-content-between align-items-center clickable-card" onclick="openDapoForKab('${kab}')">
+              <span class="fw-bold text-secondary">${kab}</span>
+              <span class="badge bg-jsit-blue fs-6">${kabCounts[kab]} SIT</span>
+            </div>
+          </div>
+        `;
+      });
+      $('#kabupatenGrid').html(gridHtml);
+    }
+
+    function openDapoForKab(kab) {
+      $('#dapoKabupaten').val(kab);
+      updateKecamatanDropdown('#dapoKabupaten', '#dapoKecamatan');
+      switchAdminTab('dapo');
+    }
+
+    // --- LOGIKA DAPOSIT (ADMIN) ---
+    function filterDapoData() {
+      const kab = $('#dapoKabupaten').val();
+      const kec = $('#dapoKecamatan').val();
+
+      currentDapoFilteredData = allData.filter(item => {
         const itemKab = item.kabupaten ? item.kabupaten.trim() : "";
         const itemKec = item.kecamatan ? item.kecamatan.trim() : "";
-
         const matchKab = (kab === 'ALL' || !kab) ? true : itemKab === kab;
         const matchKec = (kec === 'ALL' || !kec) ? true : itemKec === kec;
         return matchKab && matchKec;
       });
 
-      // Label Wilayah
-      let labelWilayah = "Seluruh Lampung";
-      if (kab !== 'ALL') {
-        labelWilayah = kab;
-        if (kec !== 'ALL') {
-          labelWilayah += ` - Kec. ${kec}`;
-        }
-      }
-
-      $('#dashboardSection').slideDown();
-      updateDashboardStats(filtered, labelWilayah);
-      renderTable(filtered);
+      updateDapoStats(currentDapoFilteredData);
+      renderDapoTable(currentDapoFilteredData);
     }
 
-    function updateDashboardStats(dataList, labelWilayah) {
-      $('#wilayahLabel').text(labelWilayah);
-
+    function updateDapoStats(dataList) {
       let total = dataList.length;
       let tk = 0, sd = 0, smp = 0, sma = 0;
 
       dataList.forEach(item => {
         const str = ((item.jenjang || '') + ' ' + (item.namaSekolah || '')).toUpperCase();
-
-        if (str.includes('TK') || str.includes('PAUD') || str.includes('RA') || str.includes('KB')) {
-          tk++;
-        } else if (str.includes('SD') || str.includes('MI')) {
-          sd++;
-        } else if (str.includes('SMP') || str.includes('MTS')) {
-          smp++;
-        } else if (str.includes('SMA') || str.includes('MA') || str.includes('SMK')) {
-          sma++;
-        } else {
-          sd++; // default fallback
-        }
+        if (str.includes('TK') || str.includes('PAUD') || str.includes('RA') || str.includes('KB')) tk++;
+        else if (str.includes('SD') || str.includes('MI')) sd++;
+        else if (str.includes('SMP') || str.includes('MTS')) smp++;
+        else if (str.includes('SMA') || str.includes('MA') || str.includes('SMK')) sma++;
+        else sd++;
       });
 
-      $('#statTotal').text(total);
-      $('#statTK').text(tk);
-      $('#statSD').text(sd);
-      $('#statSMP').text(smp);
-      $('#statSMA').text(sma);
+      $('#dapoStatTotal').text(total);
+      $('#dapoStatTK').text(tk);
+      $('#dapoStatSD').text(sd);
+      $('#dapoStatSMP').text(smp);
+      $('#dapoStatSMA').text(sma);
     }
 
-    function renderTable(data) {
-      $('#hasilPencarian').show();
-      $('#jumlahData').text(`${data.length} Data`);
-
-      if (dataTable) {
-        dataTable.destroy();
+    function filterByJenjangDapo(jenjangCode) {
+      if (jenjangCode === 'ALL') {
+        renderDapoTable(currentDapoFilteredData);
+        return;
       }
 
-      const tbody = $('#tabelSekolah tbody');
+      const filtered = currentDapoFilteredData.filter(item => {
+        const str = ((item.jenjang || '') + ' ' + (item.namaSekolah || '')).toUpperCase();
+        if (jenjangCode === 'TK') return str.includes('TK') || str.includes('PAUD') || str.includes('RA') || str.includes('KB');
+        if (jenjangCode === 'SD') return str.includes('SD') || str.includes('MI');
+        if (jenjangCode === 'SMP') return str.includes('SMP') || str.includes('MTS');
+        if (jenjangCode === 'SMA') return str.includes('SMA') || str.includes('MA') || str.includes('SMK');
+        return true;
+      });
+
+      renderDapoTable(filtered);
+    }
+
+    function renderDapoTable(data) {
+      $('#dapoJumlahData').text(`${data.length} Data`);
+
+      if (dapoTable) {
+        dapoTable.destroy();
+      }
+
+      const tbody = $('#tabelDapo tbody');
       tbody.empty();
 
       data.forEach((item, index) => {
@@ -580,42 +780,92 @@
         tbody.append(row);
       });
 
-      // PENGATURAN DATATABLE DENGAN ATAU TANPA TOMBOL EXPORT
-      let dtButtons = [];
-      if (isAdminLoggedIn) {
-        dtButtons = [
+      dapoTable = $('#tabelDapo').DataTable({
+        responsive: true,
+        ordering: false,
+        dom: '<"d-flex justify-content-between align-items-center flex-wrap mb-2"Bf>rtip',
+        buttons: [
           {
             extend: 'excelHtml5',
             className: 'btn btn-sm btn-success fw-bold me-1 mb-2',
             text: '<i class="fa-solid fa-file-excel me-1"></i> Unduh Excel',
-            title: 'Data SIT Lampung'
+            title: 'DapoSIT Data SIT Lampung'
           },
           {
             extend: 'pdfHtml5',
             className: 'btn btn-sm btn-danger fw-bold mb-2',
             text: '<i class="fa-solid fa-file-pdf me-1"></i> Unduh PDF',
-            title: 'Data SIT Lampung',
+            title: 'DapoSIT Data SIT Lampung',
             orientation: 'landscape',
             pageSize: 'A4'
           }
-        ];
-      }
-
-      dataTable = $('#tabelSekolah').DataTable({
-        responsive: true,
-        ordering: false, // Menghilangkan fitur & panah pengurutan
-        dom: isAdminLoggedIn ? '<"d-flex justify-content-between align-items-center flex-wrap mb-2"Bf>rtip' : 'frtip',
-        buttons: dtButtons,
+        ],
         language: {
           search: "Cari Cepat:",
           lengthMenu: "Tampilkan _MENU_ data",
           info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-          paginate: {
-            first: "Awal",
-            last: "Akhir",
-            next: "›",
-            previous: "‹"
-          }
+          paginate: { first: "Awal", last: "Akhir", next: "›", previous: "‹" }
+        }
+      });
+    }
+
+    // --- LOGIKA PENCARIAN PUBLIK ---
+    function filterPublicData() {
+      const kab = $('#kabupaten').val();
+      const kec = $('#kecamatan').val();
+
+      const filtered = allData.filter(item => {
+        const itemKab = item.kabupaten ? item.kabupaten.trim() : "";
+        const itemKec = item.kecamatan ? item.kecamatan.trim() : "";
+        const matchKab = (kab === 'ALL' || !kab) ? true : itemKab === kab;
+        const matchKec = (kec === 'ALL' || !kec) ? true : itemKec === kec;
+        return matchKab && matchKec;
+      });
+
+      renderPublicTable(filtered);
+    }
+
+    function renderPublicTable(data) {
+      $('#hasilPencarianPublic').show();
+      $('#jumlahDataPublic').text(`${data.length} Data`);
+
+      if (publicTable) {
+        publicTable.destroy();
+      }
+
+      const tbody = $('#tabelPublic tbody');
+      tbody.empty();
+
+      data.forEach((item, index) => {
+        const webLink = (item.website && item.website !== '-') ? `<a href="${formatUrl(item.website)}" target="_blank" class="btn btn-sm btn-outline-jsit-blue">Web</a>` : '-';
+        const sosmedLink = (item.sosialMedia && item.sosialMedia !== '-') ? `<a href="${formatUrl(item.sosialMedia)}" target="_blank" class="btn btn-sm btn-outline-info">Medsos</a>` : '-';
+
+        const row = `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${item.noKeanggotaan || '-'}</td>
+            <td><strong>${item.namaSekolah || '-'}</strong></td>
+            <td>${item.kabupaten || '-'}</td>
+            <td>${item.kecamatan || '-'}</td>
+            <td><span class="badge bg-secondary">${item.jenjang || '-'}</span></td>
+            <td>${webLink}</td>
+            <td>${sosmedLink}</td>
+            <td>
+              <button class="btn btn-sm btn-success" onclick="showDetail('${item.noKeanggotaan}')">Detail</button>
+            </td>
+          </tr>
+        `;
+        tbody.append(row);
+      });
+
+      publicTable = $('#tabelPublic').DataTable({
+        responsive: true,
+        ordering: false,
+        language: {
+          search: "Cari Cepat:",
+          lengthMenu: "Tampilkan _MENU_ data",
+          info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+          paginate: { first: "Awal", last: "Akhir", next: "›", previous: "‹" }
         }
       });
     }
