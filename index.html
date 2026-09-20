@@ -15,6 +15,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
+    :root {
+      --jsit-dark-blue: #002b5b; /* Dark Blue senada logo JSIT */
+      --jsit-dark-blue-hover: #001c3d;
+    }
+
     body {
       background-color: #f8f9fa;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -27,7 +32,7 @@
 
     .portal-title {
       font-weight: 800;
-      color: #0d6efd; /* Biru khas JSIT */
+      color: var(--jsit-dark-blue);
       letter-spacing: 0.5px;
     }
 
@@ -49,7 +54,7 @@
       content: "";
       flex: 1;
       height: 2px;
-      background: linear-gradient(to right, transparent, #0d6efd, transparent);
+      background: linear-gradient(to right, transparent, var(--jsit-dark-blue), transparent);
       max-width: 150px;
     }
 
@@ -62,6 +67,37 @@
     .card {
       border-radius: 12px;
       border: none;
+    }
+
+    /* KUSTOMISASI TEMA DARK BLUE JSIT */
+    .bg-jsit-dark {
+      background-color: var(--jsit-dark-blue) !important;
+      color: #ffffff !important;
+    }
+
+    .text-jsit-dark {
+      color: var(--jsit-dark-blue) !important;
+    }
+
+    .btn-jsit-dark {
+      background-color: var(--jsit-dark-blue);
+      color: #ffffff;
+      border: none;
+    }
+
+    .btn-jsit-dark:hover {
+      background-color: var(--jsit-dark-blue-hover);
+      color: #ffffff;
+    }
+
+    .btn-outline-jsit-dark {
+      color: var(--jsit-dark-blue);
+      border-color: var(--jsit-dark-blue);
+    }
+
+    .btn-outline-jsit-dark:hover {
+      background-color: var(--jsit-dark-blue);
+      color: #ffffff;
     }
   </style>
 </head>
@@ -104,7 +140,7 @@
 
           <div class="col-md-2 mb-3 d-grid">
             <label class="form-label">&nbsp;</label>
-            <button id="btnCari" class="btn btn-primary fw-bold">
+            <button id="btnCari" class="btn btn-jsit-dark fw-bold">
               <i class="fa-solid fa-magnifying-glass me-1"></i> Cari
             </button>
           </div>
@@ -117,8 +153,8 @@
       <div class="card shadow-sm">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="m-0 fw-bold text-primary">Hasil Pencarian</h5>
-            <span id="jumlahData" class="badge bg-primary fs-6">0 Data</span>
+            <h5 class="m-0 fw-bold text-jsit-dark">Hasil Pencarian</h5>
+            <span id="jumlahData" class="badge bg-jsit-dark fs-6">0 Data</span>
           </div>
 
           <table id="tabelSekolah" class="display responsive nowrap w-100">
@@ -147,7 +183,7 @@
   <div class="modal fade" id="detailModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header bg-primary text-white">
+        <div class="modal-header bg-jsit-dark">
           <h5 class="modal-title fw-bold">Detail Sekolah</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
@@ -282,7 +318,7 @@
       tbody.empty();
 
       data.forEach((item, index) => {
-        const webLink = (item.website && item.website !== '-') ? `<a href="${formatUrl(item.website)}" target="_blank" class="btn btn-sm btn-outline-primary">Web</a>` : '-';
+        const webLink = (item.website && item.website !== '-') ? `<a href="${formatUrl(item.website)}" target="_blank" class="btn btn-sm btn-outline-jsit-dark">Web</a>` : '-';
         const sosmedLink = (item.sosialMedia && item.sosialMedia !== '-') ? `<a href="${formatUrl(item.sosialMedia)}" target="_blank" class="btn btn-sm btn-outline-info">Medsos</a>` : '-';
 
         const row = `
