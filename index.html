@@ -142,14 +142,14 @@
     // =========================================================
     // PASTE URL WEB APP APPS SCRIPT ANDA DI SINI
     // =========================================================
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyMyhrCukwwtfyPkwBqvSlwSEzsTWXWrQKs56BO2BRlQ6VJ7BczxrS8lFKlO4VU4P49/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxrIJwdC-PNklYGJfj88SD-99uvzdSPSlCboyp-dV4L-yltc_W9cb32n8eMkQJvqP1v/exec";
 
     let allData = [];
     let dataTable = null;
 
     $(document).ready(function () {
-      if (GAS_URL === "https://script.google.com/macros/s/AKfycbyMyhrCukwwtfyPkwBqvSlwSEzsTWXWrQKs56BO2BRlQ6VJ7BczxrS8lFKlO4VU4P49/exec") {
-        alert("https://script.google.com/macros/s/AKfycbyMyhrCukwwtfyPkwBqvSlwSEzsTWXWrQKs56BO2BRlQ6VJ7BczxrS8lFKlO4VU4P49/exec");
+      if (GAS_URL === "URL_WEB_APP_APPS_SCRIPT_ANDA_DI_SINI") {
+        alert("Harap masukkan URL Web App Apps Script Anda pada variabel GAS_URL!");
         return;
       }
       loadData();
@@ -164,13 +164,18 @@
     });
 
     function loadData() {
-      fetch(GAS_URL)
-        .then(res => res.json())
-        .then(data => {
-          allData = data;
-          populateKabupatenDropdown();
-          filterAndDisplayData();
-        })
+  fetch(GAS_URL, { redirect: "follow" })
+    .then(res => res.json())
+    .then(data => {
+      allData = data;
+      populateKabupatenDropdown();
+      filterAndDisplayData();
+    })
+    .catch(err => {
+      console.error("Gagal memuat data:", err);
+      alert("Gagal mengambil data dari Google Sheet.");
+    });
+}
         .catch(err => {
           console.error("Gagal memuat data:", err);
           alert("Gagal mengambil data dari Google Sheet.");
